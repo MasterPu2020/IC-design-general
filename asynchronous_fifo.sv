@@ -90,52 +90,50 @@ module asynchronous_fifo #(
 endmodule
 
 `define Stimulus // 启用激励模块, 简易debugging, 综合时请注释该行
-
 `ifdef Stimulus
-module stim_fifo;
-    timeprecision 10ps; timeunit 1ns;
-    logic w_clk, r_clk, nrst;
-    logic w_en, r_en;
-    logic full, empty;
-    logic [31:0] w_data;
-    logic [31:0] r_data;
-    parameter
-        DATA_SIZE = 32, // 定义FIFO数据宽度
-        BURST_LENGTH = 50, // 单次突发访问的最大数据量
-        W_CLK_FEQ = 100_000_000, // Hz 定义写时钟频率
-        R_CLK_FEQ = 50_000_000, // Hz 定义读时钟频率
-        W_IDLE_CYC = 0, // 定义写空闲周期
-        R_IDLE_CYC = 0; // 定义读空闲周期
+    module stim_fifo;
+        timeprecision 10ps; timeunit 1ns;
+        logic w_clk, r_clk, nrst;
+        logic w_en, r_en;
+        logic full, empty;
+        logic [31:0] w_data;
+        logic [31:0] r_data;
+        parameter
+            DATA_SIZE = 32, // 定义FIFO数据宽度
+            BURST_LENGTH = 50, // 单次突发访问的最大数据量
+            W_CLK_FEQ = 100_000_000, // Hz 定义写时钟频率
+            R_CLK_FEQ = 50_000_000, // Hz 定义读时钟频率
+            W_IDLE_CYC = 0, // 定义写空闲周期
+            R_IDLE_CYC = 0; // 定义读空闲周期
 
-    asynchronous_fifo #( 
-        DATA_SIZE,
-        BURST_LENGTH,
-        W_CLK_FEQ,
-        R_CLK_FEQ,
-        W_IDLE_CYC,
-        R_IDLE_CYC
-    ) asynchronous_fifo (.*);
-    
-    initial begin : initiation
-        w_clk = 0;
-        r_clk = 0;
-        nrst = 1;
-        w_en = 1;
-        r_en = 1;
-        w_data = 0;
-        fork
-            forever #(1000_000_000/W_CLK_FEQ) w_clk = ~w_clk;
-            forever #(1000_000_000/R_CLK_FEQ) r_clk = ~r_clk;
-        join
-    end
-
-    initial begin // 进行一次Burst传输
-        repeat (BURST_LENGTH) begin
-            @(negedge w_clk) w_data = w_data + 1;
-            repeat (W_IDLE_CYC) @(negedge w_clk);
+        asynchronous_fifo #( 
+            DATA_SIZE,
+            BURST_LENGTH,
+            W_CLK_FEQ,
+            R_CLK_FEQ,
+            W_IDLE_CYC,
+            R_IDLE_CYC
+        ) asynchronous_fifo (.*);
+        
+        initial begin : initiation
+            w_clk = 0;
+            r_clk = 0;
+            nrst = 1;
+            w_en = 1;
+            r_en = 1;
+            w_data = 0;
+            fork
+                forever #(1000_000_000/W_CLK_FEQ) w_clk = ~w_clk;
+                forever #(1000_000_000/R_CLK_FEQ) r_clk = ~r_clk;
+            join
         end
-        $finish(2);
-    end
 
-endmodule
+        initial begin // 进行一次Burst传输
+            repeat (BURST_LENGTH) begin
+                @(negedge w_clk) w_data = w_data + 1;
+                repeat (W_IDLE_CYC) @(negedge w_clk);
+            end
+            $finish(2);
+        end
+    endmodule
 `endif
