@@ -10,6 +10,9 @@ Copyright: 装载需声明作者与该项目的GitHub链接
 
 ### 常见内容
 
+**Verilog语法**
+- [Verilog IEEE 2001 Standard](./verilog_ieee.v)
+
 **跨时钟域与异步处理**
 
 - [异步FIFO](./asynchronous_fifo.sv): 跨时钟域处理
