@@ -3,8 +3,8 @@
 // author: Clark @https://github.com/MasterPu2020
 // copyright: 备注原作者的条件下自由转载
 // features: 不常见的语法
-// version: 1.0
-// version update: 2023/8/31
+// version: 1.1
+// version update: 2023/9/10
 // -------------------------------------------------------
 
 module verilog_ieee(
@@ -23,6 +23,15 @@ parameter para_num = 0;
 localparam locpara_num = 0;
 // 其他不常用的类型
 // memory, large, medium, small, scalared, tri, triand, trior, trireg, vectored, wand, wor
+
+// 动态数据分割
+assign wire_num = reg_num[reg_num+:8]; // [base : base + width - 1] 
+assign wire_num = reg_num[reg_num-:8]; // [base : base - width + 1]
+assign wire_num = reg_num[-1:-8]; // 
+reg [0:31] reversed_reg_num; // 生成的截取方向与定义时的方向相关
+assign wire_num = reg_num[reg_num+:8]; // [base + width - 1 : base]
+assign wire_num = reg_num[reg_num-:8]; // [base - width + 1 : base]
+// 两个相反的向量赋值时值会颠倒传递
 
 // 4值变量的赋值细节(注意, Verilog中只能用assign对wire类型赋值)
 assign wire_num = 'bx; // in system verilog is 'x, 自动补齐高位x
@@ -59,6 +68,7 @@ end
 `ifdef compile
 `else
 `endif
+`default_nettype none // 开启向量对齐赋值
 
 // 属性, attribute, 用于综合指示, 或者仿真指示
 (* fsm_state = 1, dont_syn = "false" *) reg [3:0] state;
@@ -66,7 +76,12 @@ end
 // 除always和assign外的block
 
 initial begin
+
+    force wire_num = 1; // 类似于电笔, 强制赋值
+    release wire_num;
+
     // 系统函数与任务 System tasks and functions
+    
     // 常见
     $write();
     $display();
@@ -74,17 +89,24 @@ initial begin
     $monitor();
     $strobe(); // 非阻塞语句执行完毕后打印
     $finish();
+
     // 时间
     $time();  // 64位
     $stime(); // 32位
     $realtime(); // float类型
     $timeformat(); // 设置时间格式
     $printtimescale();
+
     // 浮点数与整数，比特类型的转换
     $bitstoreal();
     $realtobits(); 
     $rtoi();
     $itor(); 
+
+    // 传入参数
+    $test$plusargs(); // 获取运行控制台输入args名称
+    $value$plusargs(); // 获取运行控制台输入args的值, 格式按 "a=10"
+
     // 随机数生成
     $random(); // 用于取余限制范围
     // 均匀分布   $dist_uniform(seed, start, end);	start、end 为数据的起始、结尾
@@ -94,13 +116,22 @@ initial begin
     // 卡方分布   $dist_chi_square(seed, free_deg);	free_deg 为自由度
     //  t  分布   $dist_t(seed, free_deg);	free_deg 为自由度
     // 埃尔朗分布 $dist_erlang(seed, k_stage, mean);	k_stage 为阶数，mean 为期望
+    
     // 读写文件操作
+    // $dumpfile("路径"); 打开VCD
+    // $dumpvars(level,start_module); 要记录的信号, level=0表示记录所有
+    // $dumpflush; VCD保存
+    // $dumpoff; 停止记录
+    // $dumpon; 开始记录
+    // $dumplimit(); 限制VCD文件大小(以字节为单位）
+    // $dumpall; 记录指定的信号值
     // 文件访问：$fopen, $fclose, $ferror
     // 文件写入：$fdisplay, $fwrite, $fstrobe, $fmonitor
     // 字符串写入：$sformat, $swrite
     // 文件读取：$fgetc, $fgets, $fscanf, $fread
     // 文件定位：$fseek, $ftell, $feof, $frewind
     // 存储器加载：$readmemh, $readmemb
+    
     // 标准延迟文件
     // $sdf_annotate ('sdf_file', module_instance,'sdf_configfile','sdf_logfile','mtm_spec','scale_factors','scale_type']);
     // sdf_file: SDF 文件名字，包含路径信息。
@@ -114,9 +145,25 @@ initial begin
 
     // 并发
     fork
+        
+        // 运算优先级
+        // ! ~ **
+        // * / %
+        // + -
+        // << >> 
+        // < <= > >=
+        // == != === !==
+        // &
+        // ^ ^~
+        // |
+        // &&
+        // ||
+        // ?:
+
+        // 特殊运算用法
+        reg_num = & reg_num; // 按位依次逻辑运算
 
     join
-
 end
 
 specify // 来源: www.runoob.com
@@ -178,7 +225,7 @@ task task0 (input a, output b);
     b = #1 a;
 endtask
 
-function [31:0] func (input a, b, c);
+function [31:0] func (input a, b, c); // 单一返回值, 至少需要一个输入, 不含延迟
     func = {a,b,c};
 endfunction
 
