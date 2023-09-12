@@ -8,7 +8,7 @@
 // -------------------------------------------------------
 
 typedef parent; // 前置声明
-class parent #(parameter type bit_array = bit);
+class parent #(parameter type bit_array = bit); // 定义传入数据类型
 
     bit array[]; // 动态数组，动态调用
     bit queue[$]; // 队列，堆栈
@@ -20,7 +20,7 @@ class parent #(parameter type bit_array = bit);
 
     static int all_the_same; // 所有继承的该变量值相同
 
-    typedef struct { // 自定义数据类型
+    typedef struct { // 自定义数据类型与结构体
         integer number;
         string str;
     } struct_name;
@@ -30,7 +30,10 @@ class parent #(parameter type bit_array = bit);
     function automatic string test(string input_str);
         while (1) begin
             input_str = {input_str, this.struct_item.str};
-            break;
+            if (1) // 更多的关键词
+                continue;
+            else
+                break;
         end
         return input_str;
 
@@ -58,21 +61,59 @@ class child extends parent; // 类的继承
     // 随机与约束 
 
     rand bit random;
-    int array = '{0,1,2,3,4,5,6,7,8,9,10};
+    int array = '{0,1,2,3,4,5,6,7,8,9,10}; // 快速整数结构体，重载父类array
+    bit array1[];
 
-    constraint c {
-        random dist {0:=30, [1:3]:/90, [4:10]:=10};
-        (this.struct_item.str != "hi!") -> random inside {array}; // 蕴含条件
-        solve array before random; // 生成约束
-        random >= 0;
+    constraint c0 {
+        random dist {0:=30, [1:3]:/90, [4:10]:=10}; // 加权概率
+        (this.struct_item.str != "hi!") -> random inside {array}; // 蕴含条件与inside方法
+        solve array before random; // 顺序约束
+        if (this.struct_item.str == "hi!")
+            random >= 0;
+        else
+            random inside {array};
+        
+        foreach(array1[i]){ // foreach用法与数组约束
+            array1[i] inside {[1:3]};
+            array1.sum() < 1024; // 数组函数
+            array1.size() inside {[1:8]}; // 数组函数
+        }
 
     }
 
 endclass : child
 
+
 module system_verilog_ieee;
+
+    timeunit 1ns; timeprecision 10ps;
+
     logic clk, nrst;
     logic a, b, c, d;
     logic out;
+
+    sequence new_s1;
+        @(posedge clk) a ^ b |-> a ##1 (b == 2) [->2:5] ##1 c > 0 ##[0:4] (d == 5);
+    endsequence
+
+    property new_property;
+        // 符号解释:
+        // 打拍信号与表达式的@()敏感列表绑定
+        // ##n 第n拍后
+        // [=n:m] 非连续出现n~m次
+        // [*n:m] 非连续出现n~m次后,或关系
+        // -> 最后一拍为1
+        // [n:m] 数列n~m
+        // |-> 立刻assertion
+        // |=> 1拍后assertion
+        new_s1; // 封装时序
+    endproperty
+
+    `define expression0 (a && b == c & d && $stable(c))
+    property new_property1;
+        @(posedge clk) `expression0 |-> ## [1:2] $rose(a) ##1 $fell(b);
+    endproperty
+
+    label : assert property (new_property1); // 并发且时刻运行
 
 endmodule // testbench

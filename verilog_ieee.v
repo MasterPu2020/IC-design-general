@@ -29,8 +29,9 @@ assign wire_num = reg_num[reg_num+:8]; // [base : base + width - 1]
 assign wire_num = reg_num[reg_num-:8]; // [base : base - width + 1]
 assign wire_num = reg_num[-1:-8]; // 
 reg [0:31] reversed_reg_num; // 生成的截取方向与定义时的方向相关
-assign wire_num = reg_num[reg_num+:8]; // [base + width - 1 : base]
-assign wire_num = reg_num[reg_num-:8]; // [base - width + 1 : base]
+assign wire_num = reversed_reg_num[reversed_reg_num+:8]; // [base + width - 1 : base]
+assign wire_num = reversed_reg_num[reversed_reg_num-:8]; // [base - width + 1 : base]
+assign wire_num = reversed_reg_num[8:0]; // 最高位向低位截取9位
 // 两个相反的向量赋值时值会颠倒传递
 
 // 4值变量的赋值细节(注意, Verilog中只能用assign对wire类型赋值)
@@ -147,7 +148,8 @@ initial begin
     fork
         
         // 运算优先级
-        // ! ~ **
+        // ! ~ 
+        // **
         // * / %
         // + -
         // << >> 
@@ -159,9 +161,10 @@ initial begin
         // &&
         // ||
         // ?:
+        // {} {{}}
 
         // 特殊运算用法
-        reg_num = & reg_num; // 按位依次逻辑运算
+        reg_num = & reg_num; // 按位依次逻辑运算, 这类运算优先级最高
 
     join
 end
