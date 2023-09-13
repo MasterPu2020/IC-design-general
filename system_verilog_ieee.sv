@@ -72,6 +72,8 @@ class child extends parent; // 类的继承
             random >= 0;
         else
             random inside {array};
+
+        this.struct_item.str == "hi!" ? random >= 0 : random inside {array};
         
         foreach(array1[i]){ // foreach用法与数组约束
             array1[i] inside {[1:3]};

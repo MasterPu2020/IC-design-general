@@ -1,30 +1,37 @@
 
-作答
+作答, by Clark
+
+<RTL电路类>
 
 组合逻辑：竞争：门之间的信号延迟现象。冒险：门延迟导致的glitch现象。
 时序逻辑：竞争：延迟现象。冒险：毛刺。
 
 1. latch(datao, ~clk, datai), clko = clk & datao 上升沿有效
 2. latch(datao, clk, datai), clko = ~(~datao | clk) 下降沿有效
+ICG使用if无else的时序always模块书写
 
 t_period >= t_clk2q ( + t_jitter) + t_comb + t_setup - t_skew
 t_skew = t_clk2back_FF  t_clk2front_FF 
-t_skew + t_comb + t_clk2q ( + t_jitter) >= t_hold
+t_comb + t_clk2q ( + t_jitter) - t_skew >= t_hold
+Duty Cycle Distorition：占空比失真，可以反应时钟裕度
 
+同步时钟：相位存在固定关系
 两级D触发器串联
 gary_code = (bin_code >> 1) ^ bin_code
 见代码
 在一片frame时间中，写入总量减去读出总量所剩下的量，就是需要存储在fifo中的量。
-异步fifo的读写地址需要打两拍做跨时钟域的信号传输，再进行比较。所以考虑最坏情况，读写存在4个周期的延迟，需要至少4个深度进行缓存
+异步fifo的读写地址需要打两拍做跨时钟域的信号传输，再进行比较。等效的读频率为原来的1/4，等效写频率为原来的1/2.
 异步握手协议使快时钟域主动降速并尽可能与慢时钟域时钟同步。
 
 见代码
 
-P = (1/2 * C_load * Vdd**2 + I_short * Vdd) * Ncmos * f_clk + I_leak * Vdd * Ncmos 
-传输级：工艺相关
-门级：clock gating，power gating，
-RTL级：pipeline，组合逻辑隔离，高反转组合逻辑重排，低能耗编码
-系统级：低电压，缩小面积，省能耗的协议与架构
+P = C_load * Vdd**2 * f_switch + I_peak * Vdd  + I_leak * Vdd 
+先进工艺温度越高速度越快，40nm以上反之。电压越低速度越慢。hold setup想想就明白了。
+传输管级：工艺相关，体偏置技术
+门级：clock gating，power gating，消除组合冒险毛刺，合理分配高耗电引脚
+RTL级：资源共享（组合型资源复用），组合逻辑（操作数）隔离，高反转组合逻辑重排或分离，低能耗编码（汉明距离编码解码，独热码，格雷码等），组合逻辑开关控制
+体系结构级：多阈值设计，多电压域，多时钟域, pipeline（时序型资源复用）, 低电压，缩小面积，降低时钟频率
+系统级：省能耗的协议与架构，优化算法
 
 if注意判定顺序，设计计数电路即可
 
@@ -32,3 +39,11 @@ if注意判定顺序，设计计数电路即可
 非阻塞运算会在block执行结束时并发执行，阻塞运算会一条一条执行
 见代码
 [offset base +:(-:) width] 注意offset base是从0开始数的比特位，width是从1开始数的比特数
+
+<RTL验证类>
+
+uvm库的类结构及其功能，以及动静态特性，例化方法。
+
+<DC类>
+
+静态时序分析基础
