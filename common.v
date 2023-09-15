@@ -21,6 +21,17 @@ module template (
 
 endmodule
 
+// 独热码转二进制
+module onehot2bin (
+    input [7:0] onehot,
+    output [2:0] bin);
+
+    assign bin[2] = | onehot[7:4];
+    assign bin[1] = onehot[2] | onehot[3] | onehot[6] | onehot[7];
+    assign bin[0] = onehot[1] | onehot[3] | onehot[5] | onehot[7];
+
+endmodule
+
 // 统计1024连续8bit输入直方图，实时输出当前出现最多的数字
 module counter (
     input clk, nrst, write,
@@ -66,15 +77,6 @@ module counter (
 
 endmodule
 
-// booth乘法器
-module booth_multipiler (
-    input clk, nrst,
-    input [7:0] multiplicant, multipiler,
-    output reg [14:0] result
-);
-    
-endmodule
-
 // 二分频
 module clk_div2 (
     input clk, nrst,
@@ -84,7 +86,7 @@ module clk_div2 (
         if (~ nrst)
             clk2 <= 0;
         else
-            clk2 = ~ clk2;
+            clk2 <= ~ clk2;
 endmodule
 
 // 计数器分频, 奇偶通用
@@ -165,7 +167,7 @@ module m_div_n_clk #(parameter M = 7, N = 3)(
     reg [$clog2(SLOW_FREQ_DIV)-1:0] div_cnt1;
     reg [$clog2(FAST_FREQ_DIV)-1:0] div_cnt2;
 
-    // M个周期进行计数
+    // M个周期进行计数, 也可以用状态机实现
     always @(posedge clk_in, negedge nrst) 
         if (~ nrst)
             m_cnt <= 0;
