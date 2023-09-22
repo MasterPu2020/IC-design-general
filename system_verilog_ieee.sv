@@ -51,7 +51,7 @@ class parent #(parameter type bit_array = bit); // 定义传入数据类型
     endfunction
 
     virtual function void print();
-        // 虚函数用于规划子类功能
+        // 虚函数用会调用子类的方法
     endfunction;
 
 endclass : parent
@@ -117,5 +117,11 @@ module system_verilog_ieee;
     endproperty
 
     label : assert property (new_property1); // 并发且时刻运行
+
+    initial begin
+        fork
+            // 多线程问题：线程会在本时刻的所有非阻塞语句完成后并发执行，注意列出线程之间的先后关系
+        join_none
+    end
 
 endmodule // testbench

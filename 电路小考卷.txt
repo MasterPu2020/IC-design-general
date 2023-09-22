@@ -19,7 +19,7 @@
 
     画出全加器电路，减法器电路。画出8bit加法器电路。画出booth乘法器并介绍算法，区分有符号与无符号两种电路。画出组合逻辑乘法器电路，区分有符号与无符号两种电路。写出有符号数加法overflow的判定。
 
-    使用Verilog设计：设计奇偶和小数分频电路，第一个1的组合逻辑，格雷码与bin互转，独热码与bin互转，对数计算电路。
+    使用Verilog设计：设计奇偶和小数分频电路，第一个1的组合逻辑，格雷码与bin互转，bin转BCD，独热码与bin互转，对数计算电路。
 
     写出Verilog的所有运算符号及其优先级。介绍阻塞与非阻塞赋值的区别。列出verilog的所有系统函数并介绍其用法。verilog的截取与拼接运算方式有哪些。verilog的变量类型，block类型以及关键字有哪些。
 
@@ -29,23 +29,31 @@
 
 <DC类>
 
+    DC的类有哪些，tcl语法
+
     STA能分析哪些路径，时钟主要特征有哪些
 
-    简要介绍ECO与形式验证
+    简要介绍ECO, IPO与形式验证
 
-    false_path用法
+    false_path，group/flatten用法
 
 <计算机级或SoC级设计>
 
-    串行I2C UART SPI USB总线, 片上总线AXI AHB APB (AMBA series)协议, 板上数据交换PCIe，TCP/IP协议与传输速率
+    串行I2C UART SPI USB总线, 片上总线AXI AHB ASB APB (AMBA series)协议, 板上数据交换PCIe，以太网协议与传输速率
 
     校验机制：奇偶校验，CRC
 
-    cache结构
+    cache结构，内存一致性协议
 
-    unix操作系统内存分级
+    内存地址映射
+
+    乱序执行技术
+
+    并发技术有哪些
 
 <传输级计算>
+
+    RC模型延迟计算，CMOS的fan-out电容与input电容计算
 
     MOS电流电压公式
 

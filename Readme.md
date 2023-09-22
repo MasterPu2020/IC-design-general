@@ -6,7 +6,7 @@ Author: Clark Pu
 
 Copyright: 装载需声明作者与该项目的GitHub链接
 
-本库中的知识需要一定的数字IC知识储备，不适合初学者阅读学习
+Notification: 本库中的知识需要一定的数字IC知识储备，不适合初学者阅读学习
 
 ---
 

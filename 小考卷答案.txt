@@ -25,15 +25,15 @@
         见代码
         在一片frame时间中，写入总量减去读出总量所剩下的量，就是需要存储在fifo中的量。
         异步fifo的读写地址需要打两拍做跨时钟域的信号传输，再进行比较。等效的读频率为原来的1/4，等效写频率为原来的1/2.
-        异步握手协议使快时钟域主动降速并尽可能与慢时钟域时钟同步。
+        异步握手协议使快时钟域主动降速并尽可能与慢时钟域时钟同步。脉冲信号亦是如此。
     
     - 画出无毛刺切换的时钟选择器，区分同步时钟和异步时钟
     - 画出异步复位，同步释放电路。在verilog的specify block中用哪两个系统函数对其进行检查？
         见代码
 
     - 写出RTL功耗计算公式。列出SoC降低功耗方法的层级及其对应的降低功耗的办法。温度对芯片速度与hold setup违例的影响
-        P = C_load * Vdd**2 * f_switch + I_peak * Vdd  + I_leak * Vdd 
-        先进工艺温度越高速度越快，40nm以上反之。电压越低速度越慢。hold setup想想就明白了。
+        P = C_load * Vdd**2 * f_switch + I_peak * Vdd * f_switch  + I_leak * Vdd 
+        先进工艺温度越高速度越快，40nm以上反之。电压越低速度越慢(Vth相反)。hold setup想想就明白了。
         传输管级：工艺相关，体偏置技术
         门级：clock gating，power gating，消除组合冒险毛刺，合理分配高耗电引脚
         RTL级：资源共享（组合型资源复用），组合逻辑（操作数）隔离，高反转组合逻辑重排或分离，低能耗编码（汉明距离编码解码，独热码，格雷码等），组合逻辑开关控制
@@ -56,16 +56,17 @@
 
         无符号除法器booth加法变减法即可
 
-    - 使用Verilog设计：设计奇偶和小数分频电路，第一个1的组合逻辑，格雷码与bin互转，独热码与bin互转，对数计算电路。
+    - 使用Verilog设计：设计奇偶和小数分频电路，第一个1的组合逻辑，格雷码与bin互转，bin转BCD，独热码与bin互转，对数计算电路。
 
-        找第一个1的位数 onehot key = reverse(sequence) & (~reverse(sequence)+1)
-        独热码转2进制见代码
+        找第一个1的位数 onehot key = reverse(sequence) & (~reverse(sequence)+1), 最后一个1不用反转
+        二进制转BCD：加三左移法：左移一次，BCD寄存中哪一位大于7哪一位加3，让其溢出。移动八次。
+        独热码转2进制见代码，按二进制位数反转规律解码
         log2的对数运算整数部分结果=运算对象的第一个1的位数
 
     - 写出Verilog的所有运算符号及其优先级。介绍阻塞与非阻塞赋值的区别。列出verilog的所有系统函数并介绍其用法。verilog的截取与拼接运算方式有哪些。verilog的变量类型，block类型以及关键字有哪些。
 
-        ! ~, **, * / %, + -, << >>, > >= < <=, == != === !==, &, ^ ^~, |, &&, ||, ?:, {} {{}} 
-        非阻塞运算会在block执行结束时并发执行，阻塞运算会一条一条执行
+        “” {} {{}}, ! ~, **, * / %, + -, << >>, > >= < <=, == != === !==, &, ^ ^~, |, &&, ||, ?:
+        非阻塞运算会在block执行结束时并发执行，阻塞运算会一条一条执行，一些系统操作会在非阻塞结束时开始
         见代码
         [offset base +:(-:) width] 注意offset base是从0开始数的比特位，width是从1开始数的比特数，截取方向与定义时候的方向相关
 
@@ -74,8 +75,8 @@
     - uvm库的类结构及其功能，以及动静态特性，例化方法。
 
         void-> object -> transient -> sequence item -> sequence base
-                    -> report object -> component -> agent, diver, monitor, scoreboard, environment, test
-                                                    例化component需要声明父类，其为静态类
+                      -> report object -> component -> agent, diver, monitor, scoreboard, environment, test
+                                                      例化component需要声明父类，其为静态类
                                                     -> root
 
 <DC类>
@@ -83,6 +84,7 @@
     - STA能分析哪些路径，时钟主要特征有哪些
         
         对象均为Clock，R2R, I2O, I2R, R2O. jitter skew duty cycle distorition(main 3), transient, duty cycle.
+        R2R是clk->q->comb->d的路径
     
     - 简要介绍ECO与形式验证
         
@@ -92,16 +94,24 @@
         
         用于设置STA不需要分析的路径
 
+    - 优化优先级
+
+        DRC > timing > area > power
+        DRC主要检查门驱动是否超标
+
 <计算机级或SoC级设计>
 
-    - 串行I2C UART SPI USB总线, 片上总线AXI AHB APB (AMBA series)协议, 板上数据交换PCIe，TCP/IP协议与传输速率
+    只挑想讲的
 
-    - 校验机制：奇偶校验，CRC
+    - 乱序执行技术
+        
+        托马苏诺算法通过寄存器重命名解决WAW与WAR冒险，运算结果存入保留站，然后顺序提交。
 
-    - cache结构
+    - 并发技术有哪些
 
-    - unix操作系统内存分级
+        标量处理器：单指令多数据（向量处理器（GPU）），多核+原子操作与lock或fence，超长指令字(VLIW实现半超标量)
 
+        超标量技术：超线程（安全性存在问题）
 
 <传输级计算>
 

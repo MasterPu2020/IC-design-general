@@ -138,7 +138,7 @@ initial begin
     // sdf_file: SDF 文件名字，包含路径信息。
     // module_instance: 例化的设计模块名字，一般为 testbench 中所例化的数字设计模块名称，注意和 SDF 文件内容中的声明保持层次的一致。
     // log_file: 编译时关于 SDF 的日志，方便查阅。
-    // mtm_spec: 指定使用的延迟类型，选项包括 MAXIMUM、MINIMUM、TYPICAL，分别表示使用 SDF 文件中标注的最大值、最小值或典型值。当然上述 SDF 文件例子中没有给出典型值。
+    // mtm_spec: 指定使用的延迟类型，选项包括 MAXIMUM、MINIMUM、TYPICAL，分别表示使用 SDF 文件中标注的最大值、最小值或典型值。
     // (来源: www.runoob.com)
 
     // Verilog的initial块中也允许使用敏感信号
@@ -148,6 +148,7 @@ initial begin
     fork
         
         // 运算优先级
+        // “” {} {{}}
         // ! ~ 
         // **
         // * / %
@@ -161,7 +162,6 @@ initial begin
         // &&
         // ||
         // ?:
-        // {} {{}}
 
         // 特殊运算用法
         reg_num = & reg_num; // 按位依次逻辑运算, 这类运算优先级最高
